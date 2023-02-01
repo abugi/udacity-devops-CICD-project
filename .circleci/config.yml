@@ -209,27 +209,28 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.9.16
+      - image: python:3.8-alpine3.15 
     steps:
       - checkout
-      - add_ssh_keys:
+      - add_ssh_keys: 
           fingerprints: ["78:8e:b1:2e:e8:69:b8:da:ab:b6:47:dc:58:e1:82:c8"]
       - attach_workspace:
           at: ~/
       - run:
           name: Install dependencies
           command: |
-            apt-get update -y
-            apt install ansible -y
-            apt install awscli -y
-            which ansible
+            apk add --update ansible
+            apk add --update --no-cache python3 py3-pip
+            /usr/local/bin/python -m pip install --upgrade pip
+            pip install awscli
       - run:
           name: Configure server
           command: |
-            cd .circleci/ansible
-            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt configure-server.yml
+            cd ~/project/.circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 #   run-migrations:
 #     docker:
