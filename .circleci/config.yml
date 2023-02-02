@@ -208,27 +208,68 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.9.16
+      # Docker image here that supports Ansible
+      - image: amazon/aws-cli
     steps:
+      # Checkout code from git
       - checkout
-      - add_ssh_keys:
-          fingerprints: ["78:8e:b1:2e:e8:69:b8:da:ab:b6:47:dc:58:e1:82:c8"]
-      - attach_workspace:
-          at: ~/
       - run:
           name: Install dependencies
           command: |
-            apt-get update -y
-            apt install ansible -y
-            apt install awscli -y
-            which ansible
+            # Your code here
+            yum install -y gcc libffi-devel python3 epel-release && \
+            yum install -y python3-pip && \
+            yum install -y wget && \
+            yum clean all && \
+            yum update -y && \
+            yum install -y tar gzip curl unzip openssh-server openssh-clients && \
+            python3 -m pip install ansible
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+           fingerprints: ["78:8e:b1:2e:e8:69:b8:da:ab:b6:47:dc:58:e1:82:c8"]
+      # attach workspace
+      - attach_workspace:
+          at: ~/
       - run:
           name: Configure server
           command: |
+            # Your code here
             cd .circleci/ansible
-            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt configure-server.yml
-      - destroy-environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+            ansible-playbook -i inventory.txt configure-server.yml
+      # - run:
+      #     name: node_exporter
+      #     command: |
+      #       # Your code here
+      #       cd .circleci/ansible
+      #       ansible-playbook -i inventory.txt node-exporter.yml
+
+      # Here's where you will add some code to rollback on failure 
+      - remove-bucket-contents
+      - destroy-environment 
+
+  # configure-infrastructure:
+  #   docker:
+  #     - image: python:3.9.16
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: ["78:8e:b1:2e:e8:69:b8:da:ab:b6:47:dc:58:e1:82:c8"]
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           apt-get update -y
+  #           apt install ansible -y
+  #           apt install awscli -y
+  #           which ansible
+  #     - run:
+  #         name: Configure server
+  #         command: |
+  #           cd .circleci/ansible
+  #           ansible-playbook -i ~/project/.circleci/ansible/inventory.txt configure-server.yml
+  #     - destroy-environment:
+  #         workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
 #   run-migrations:
 #     docker:
