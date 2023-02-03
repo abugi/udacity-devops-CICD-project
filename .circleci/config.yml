@@ -265,8 +265,8 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-      - restore_cache:
-          keys: [backend-build]
+      # - restore_cache:
+      #     keys: [backend-build]
       # - aws-cli/setup
       # - restore_cache:
       #     keys: [scan-backend]      
@@ -274,11 +274,11 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            # rm package-lock.json
-            # rm -r node_modules
-            # npm cache clean --force
-            # # Run and save the migration output
-            # npm install
+            rm package-lock.json
+            rm -r node_modules
+            npm cache clean --force
+            # Run and save the migration output
+            npm install
             # npm audit fix --audit-level=critical --force
             npm run migrations > migrations_dump.txt
             # no_output_timeout: 5m
