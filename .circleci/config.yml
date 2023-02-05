@@ -406,9 +406,9 @@ jobs:
             else
                 exit 1
             fi
-      - destroy-environment
-      - revert-migrations
-      - remove-bucket-contents
+      # - destroy-environment
+      # - revert-migrations
+      # - remove-bucket-contents
 
 
 #   cloudfront-update:
